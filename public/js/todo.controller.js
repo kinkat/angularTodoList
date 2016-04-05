@@ -7,17 +7,23 @@
 
 			var self = this;
 			self.todos = [];
+			self.toggleAllCheckbox = false;
 
 			todoStorage.getItem().success(function(data){
 				self.todos = data;
 			});
+						
 
-			
-			self.toggleAllCheckbox = false;
-			
+			self.addTodo = function(){
+				var newItem = {
+					title: self.title
+				};
 
-			self.addTodo=function(){
-				self.todos.push({"title":self.title});
+				todoStorage.postItem(newItem).success(function(item)
+					{
+						self.todos.push(item);
+					});
+				
 				self.title="";
 			};
 
@@ -27,14 +33,24 @@
    				});
   			};
 
-  			self.toggleAll = function() {
+  			self.toogleItem = function(todo) {
+  				todoStorage.updateItem(todo).success(function()
+  				{
+  				});
+  			};
+
+  	  		self.toggleAll = function() {
         		if (self.toggleAllCheckbox) {
             		self.toggleAllCheckbox = true;
+
         		} else {
             		self.toggleAllCheckbox = false;
         		}
         		angular.forEach(self.todos, function(item) {
             		item.completed = self.toggleAllCheckbox;
+            		todoStorage.updateItem(item).success(function()
+  					{
+  					});
         		});
     		};
 
@@ -42,12 +58,11 @@
 				//function sets item id to remove from view
 				var itemToRemove = self.todos.filter(function(item){
 					return item.id === id;
-					console.log(id);
 				});
 				//removes data from server
 				todoStorage.removeItem(id).success(function(){
-					console.log("jaja");
-				})
+					console.log("Item deleted");
+				});
 				//render view
 				self.todos.splice(self.todos.indexOf(itemToRemove[0]), 1);
 			};

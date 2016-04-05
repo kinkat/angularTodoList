@@ -8,14 +8,18 @@
 		todoStorage.getItem = function(){
 			return $http.get(urlBase);
 		};
+
+		todoStorage.postItem = function(item){
+			return $http.post(urlBase, item)
+		};
 		
-		todoStorage.removeItem = function(id){ console.log(id);
+		todoStorage.removeItem = function(id){ 
 			return $http.delete(urlBase + '/' + id);
 		};
 
-		// todoStorage.updateItem = function(id){
-		// 	return $http.
-		// }
+		todoStorage.updateItem = function(item){
+			return $http.put(urlBase + '/' + item.id, item);
+		}
 
 		return todoStorage;
 	}]);
