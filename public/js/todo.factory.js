@@ -13,9 +13,9 @@
 			return $http.delete(urlBase + '/' + id);
 		};
 
-		todoStorage.updateItem = function(id){
-			return $http.
-		}
+		// todoStorage.updateItem = function(id){
+		// 	return $http.
+		// }
 
 		return todoStorage;
 	}]);
