@@ -4,7 +4,7 @@
 	.config(function($routeProvider){
 		$routeProvider
 			.when('/:filter?', {
-			templateUrl:'/Templates/index.html',
+			templateUrl:'/layout/index.html',
 			controller:"ToDoCtrl",
 			controllerAs: "tod"
 			})

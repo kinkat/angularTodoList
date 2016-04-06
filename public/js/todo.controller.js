@@ -1,71 +1,100 @@
 (function(){
+	'use strict'
+
 	angular
 	.module('todo')
 	.controller("ToDoCtrl", ToDoCtrl)
 	
-		function ToDoCtrl(todoStorage){
+		function ToDoCtrl(todoStorage) {
 
-			var self = this;
-			self.todos = [];
-			self.toggleAllCheckbox = false;
+			var vm = this;
+			vm.todos = [];
+			vm.toggleAllCheckbox = false;
 
-			todoStorage.getItem().success(function(data){
-				self.todos = data;
+			vm.addTodo = addTodo;
+			vm.editTodo = editTodo;
+			vm.saveEditedTodo = saveEditedTodo;
+			vm.removeTodo = removeTodo;
+			vm.toogleItem = toogleItem;
+			vm.toggleAll = toggleAll;
+			vm.clearCompleted = clearCompleted;
+
+			todoStorage.getItem().success(function(data) {
+				vm.todos = data;
 			});
 						
-
-			self.addTodo = function(){
+			function addTodo() {
 				var newItem = {
-					title: self.title
+					title: vm.title
 				};
 
-				todoStorage.postItem(newItem).success(function(item)
-					{
-						self.todos.push(item);
-					});
+				todoStorage.postItem(newItem).success(function(item) {
+						vm.todos.push(item);
+				});
 				
-				self.title="";
+				vm.title = "";
 			};
 
-			self.clearCompleted = function(){
-   				self.todos = self.todos.filter(function(item){
-    			return !item.completed;
-   				});
-  			};
+			function editTodo(todo) {
+				vm.editedTodo = todo;
+				vm.originalTodo = angular.extend({}, todo);
+			};
 
-  			self.toogleItem = function(todo) {
-  				todoStorage.updateItem(todo).success(function()
-  				{
+			function saveEditedTodo(todo) {
+				return todoStorage.updateItem(todo).then(function() {	
+					vm.editedTodo = "";
+  				});
+			};
+
+			function removeTodo(id) {
+				//function sets item id to remove from view
+				var itemToRemove = vm.todos.filter(function(item) {
+					return item.id === id;
+				});
+				//removes data from server
+				return todoStorage.removeItem(id).then(function() {
+					console.log("Item deleted");
+				});
+				//render view
+				vm.todos.splice(vm.todos.indexOf(itemToRemove[0]), 1);
+			};
+
+			function toogleItem(todo) {
+  				return todoStorage.updateItem(todo).then(function() {
   				});
   			};
 
-  	  		self.toggleAll = function() {
-        		if (self.toggleAllCheckbox) {
-            		self.toggleAllCheckbox = true;
+  	  		function toggleAll() {
+        		if (vm.toggleAllCheckbox) {
+            		vm.toggleAllCheckbox = true;
 
         		} else {
-            		self.toggleAllCheckbox = false;
+            		vm.toggleAllCheckbox = false;
         		}
-        		angular.forEach(self.todos, function(item) {
-            		item.completed = self.toggleAllCheckbox;
-            		todoStorage.updateItem(item).success(function()
-  					{
+        		angular.forEach(vm.todos, function(item) {
+            		item.completed = vm.toggleAllCheckbox;
+            		return todoStorage.updateItem(item).then(function() {
   					});
         		});
     		};
 
-			self.removeTodo=function(id){
-				//function sets item id to remove from view
-				var itemToRemove = self.todos.filter(function(item){
-					return item.id === id;
+			function clearCompleted() {
+				var itemsCompleted = vm.todos.filter(function(item) {
+					return item.completed;
 				});
-				//removes data from server
-				todoStorage.removeItem(id).success(function(){
-					console.log("Item deleted");
+
+				vm.todos = vm.todos.filter(function(item){
+   				    return !item.completed;
+   				});
+
+				itemsCompleted.forEach(function(item){
+					return todoStorage.removeItem(item.id).then(function() {
+					});
 				});
-				//render view
-				self.todos.splice(self.todos.indexOf(itemToRemove[0]), 1);
-			};
+
+
+  			};
+ 			
 		};
 
 })();
