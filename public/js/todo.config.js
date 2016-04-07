@@ -4,9 +4,9 @@
 	.config(function($routeProvider){
 		$routeProvider
 			.when('/:filter?', {
-			templateUrl:'/layout/index.html',
-			controller:"ToDoCtrl",
-			controllerAs: "tod"
+				templateUrl:'/layout/index.html',
+				controller:"ToDoCtrl",
+				controllerAs: "tod"
 			})
 			.otherwise({redirectTo:'/'});
 	});	

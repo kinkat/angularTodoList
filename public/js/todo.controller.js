@@ -8,18 +8,21 @@
 		function ToDoCtrl(todoStorage) {
 
 			var vm = this;
+
 			vm.todos = [];
 			vm.toggleAllCheckbox = false;
 
 			vm.addTodo = addTodo;
-			vm.editTodo = editTodo;
-			vm.saveEditedTodo = saveEditedTodo;
-			vm.removeTodo = removeTodo;
-			vm.toogleItem = toogleItem;
-			vm.toggleAll = toggleAll;
 			vm.clearCompleted = clearCompleted;
+			vm.editTodo = editTodo;
+			vm.removeTodo = removeTodo;
+			vm.saveEditedTodo = saveEditedTodo;
+			vm.toggleAll = toggleAll;
+			vm.toogleItem = toogleItem;
+			
+			
 
-			todoStorage.getItem().success(function(data) {
+			todoStorage.getItem().then(function(data) {
 				vm.todos = data;
 			});
 						
@@ -28,7 +31,7 @@
 					title: vm.title
 				};
 
-				todoStorage.postItem(newItem).success(function(item) {
+				todoStorage.postItem(newItem).then(function(item) {
 						vm.todos.push(item);
 				});
 				
@@ -51,12 +54,12 @@
 				var itemToRemove = vm.todos.filter(function(item) {
 					return item.id === id;
 				});
-				//removes data from server
+				//removes data from server and render view
 				return todoStorage.removeItem(id).then(function() {
-					console.log("Item deleted");
+					vm.todos.splice(vm.todos.indexOf(itemToRemove[0]), 1);
 				});
-				//render view
-				vm.todos.splice(vm.todos.indexOf(itemToRemove[0]), 1);
+				
+				
 			};
 
 			function toogleItem(todo) {
